@@ -1,0 +1,70 @@
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-image: url('https://www.sciencealert.com/images/2021-02/processed/whatistime_web_1024.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.sign-in-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.sign-in-box {
+  background: rgba(255, 255, 255, 1);
+  border-radius: 10px;
+  padding: 20px;
+  width: 400px;
+  box-shadow: 15px 15px 15px rgba(34, 32, 32, 0.3);
+}
+
+.sign-in-box h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.input-group input[type='text'],
+.input-group input[type='password'] {
+  width: calc(100% - 20px);
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.input-group input[type='checkbox'] {
+  margin-right: 5px;
+}
+
+.btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn:hover {
+  background: #555;
+}
