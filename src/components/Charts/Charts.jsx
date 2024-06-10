@@ -54,23 +54,27 @@ const Charts = () => {
         const response = await axiosInstance.get('/salaries/total_work_hours_all_users');
         const data = response.data;
 
-        const series = [];
-        const labels = [];
+        if (data && data.total_work_hours_by_user) {
+          const series = [];
+          const labels = [];
 
-        for (const userName in data.total_work_hours_by_user) {
-          series.push(data.total_work_hours_by_user[userName]);
-          labels.push(`${userName}`);
+          for (const userName in data.total_work_hours_by_user) {
+            series.push(data.total_work_hours_by_user[userName]);
+            labels.push(`${userName}`);
+          }
+
+          setState((prevState) => ({
+            ...prevState,
+            series: series,
+            options: {
+              ...prevState.options,
+              labels: labels,
+              colors: generateRandomColors(series.length),
+            },
+          }));
+        } else {
+          console.error('Unexpected data structure:', data);
         }
-
-        setState((prevState) => ({
-          ...prevState,
-          series: series,
-          options: {
-            ...prevState.options,
-            labels: labels,
-            colors: generateRandomColors(series.length), // Set random colors
-          },
-        }));
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -79,7 +83,6 @@ const Charts = () => {
     fetchData();
   }, []);
 
-  // Function to generate random colors
   const generateRandomColors = (numColors) => {
     const colors = [];
     for (let i = 0; i < numColors; i++) {

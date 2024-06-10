@@ -32,7 +32,7 @@ function Day({ day, rowIdx }) {
     const dateString = day.format('YYYY-MM-DD');
     if (attendanceData.hasOwnProperty(dateString)) {
       const { time_worked } = attendanceData[dateString];
-      return time_worked >= 8 ? 'bg-green-300 dark:bg-green-700' : 'bg-red-500 dark:bg-red-800';
+      return time_worked >= 8 ? 'bg-green-300 dark:bg-green-600' : 'bg-red-500 dark:bg-red-800';
     }
     return '';
   }
@@ -64,10 +64,10 @@ function Day({ day, rowIdx }) {
         <footer className="text-center text-xs mt-16">
           {attendanceData.hasOwnProperty(day.format('YYYY-MM-DD')) && (
             <>
-              <p className="mb-1 text-sm dark:text-gray-300">
+              <p className="mb-1 text-sm dark:text-gray-100">
                 Worked: {attendanceData[day.format('YYYY-MM-DD')].time_worked} hours
               </p>
-              <p className="text-gray-600 text-sm dark:text-red-500">
+              <p className="text-gray-600 text-sm dark:text-red-700">
                 Missing: {attendanceData[day.format('YYYY-MM-DD')].missing_time} hours
               </p>
             </>

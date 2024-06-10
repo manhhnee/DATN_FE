@@ -16,20 +16,12 @@ const AccountManagement = () => {
   const [departments, setDepartments] = useState([]);
   const [userData, setUserData] = useState([]);
   const [attendances, setAttendances] = useState({});
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isModalOpen1, setIsModalOpen1] = useState(false);
-  const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [isModalOpen3, setIsModalOpen3] = useState(false);
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showSuccess2, setShowSuccess2] = useState(false);
   const [showSuccess3, setShowSuccess3] = useState(false);
-  const [formData1, setFormData1] = useState({
-    first_name: '',
-    last_name: '',
-    phone_number: '',
-    date_of_birth: '',
-    avatar: null,
-  });
 
   const [formData2, setFormData2] = useState({
     email: '',
@@ -78,18 +70,6 @@ const AccountManagement = () => {
 
   const getFullName = (first_name, last_name) => `${first_name} ${last_name}`;
 
-  const handleSubmit = async (e) => {
-    const updateData = new FormData();
-    for (const key in formData1) {
-      if (formData1[key]) {
-        updateData.append(key, formData1[key]);
-      }
-    }
-    try {
-      await axiosInstance.put(`/user/${userId}`);
-    } catch (error) {}
-  };
-
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     const updateData = new FormData();
@@ -108,7 +88,7 @@ const AccountManagement = () => {
         const userId = response.data.user.id;
         navigate(`${config.routes.capture.replace(':user_id', userId)}`);
       }
-      setIsModalOpen2(false);
+      setIsModalOpen1(false);
       setShowSuccess(true);
 
       setTimeout(() => setShowSuccess(false), 3000);
@@ -122,7 +102,7 @@ const AccountManagement = () => {
       await axiosInstance.delete(`/users/${userId}`);
       const response = await axiosInstance.get('/users');
       setUserData(response.data.data);
-      setIsDeleteModalOpen(false);
+      setIsModalOpen3(false);
       setShowSuccess3(true);
 
       setTimeout(() => setShowSuccess3(false), 3000);
@@ -142,7 +122,7 @@ const AccountManagement = () => {
           user_id: userId,
         },
       });
-      setIsModalOpen3(false);
+      setIsModalOpen2(false);
       setShowSuccess2(true);
 
       setTimeout(() => setShowSuccess2(false), 3000);
@@ -154,14 +134,6 @@ const AccountManagement = () => {
         console.error('Calculate salary error:', error);
       }
     }
-  };
-
-  const handleInputChange1 = (e) => {
-    const { name, value } = e.target.value;
-    setFormData1({
-      ...formData1,
-      [name]: value,
-    });
   };
 
   const handleInputChange2 = (e) => {
@@ -184,10 +156,6 @@ const AccountManagement = () => {
     setIsModalOpen1(true);
   };
 
-  const openModal2 = () => {
-    setIsModalOpen2(true);
-  };
-
   const closeModal1 = () => {
     setIsModalOpen1(false);
   };
@@ -196,22 +164,18 @@ const AccountManagement = () => {
     setIsModalOpen2(false);
   };
 
-  const closeModal3 = () => {
-    setIsModalOpen3(false);
-  };
-
-  const handleDeleteButtonClick = (user_id) => {
-    setUserId(user_id);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleViewAttendance = (user_id) => {
+  const openModal3 = (user_id) => {
     setUserId(user_id);
     setIsModalOpen3(true);
   };
 
-  const handleCloseModal = () => {
-    setIsDeleteModalOpen(false);
+  const handleViewAttendance = (user_id) => {
+    setUserId(user_id);
+    setIsModalOpen2(true);
+  };
+
+  const closeModal3 = () => {
+    setIsModalOpen3(false);
   };
 
   const formatTime = (isoString) => {
@@ -230,7 +194,7 @@ const AccountManagement = () => {
           <h4 className="text-xl font-semibold text-black dark:text-white">List Account</h4>
           <button
             type="button"
-            onClick={openModal2}
+            onClick={openModal1}
             className="ml-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
             <svg
@@ -292,7 +256,7 @@ const AccountManagement = () => {
             </div>
             <div className="flex border-[#eee]  dark:border-strokedark">
               <div className="flex space-x-3.5">
-                <button onClick={() => handleDeleteButtonClick(user.id)} className="hover:text-primary-600">
+                <button onClick={() => openModal3(user.id)} className="hover:text-primary-600">
                   <svg
                     className="fill-current"
                     width="18"
@@ -320,7 +284,7 @@ const AccountManagement = () => {
                   </svg>
                 </button>
                 {/* Open modal delete User */}
-                {isDeleteModalOpen && (
+                {isModalOpen3 && (
                   <AnimatePresence>
                     <motion.div
                       initial={{ opacity: 0, y: -50 }}
@@ -338,7 +302,7 @@ const AccountManagement = () => {
                           <div className="flex justify-end space-x-2 mt-4">
                             <button
                               className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded px-4 py-2"
-                              onClick={handleCloseModal}
+                              onClick={closeModal3}
                             >
                               Cancel
                             </button>
@@ -371,7 +335,7 @@ const AccountManagement = () => {
                   </svg>
                 </button>
                 {/* Open modal view Attendance by UserID */}
-                {isModalOpen3 && (
+                {isModalOpen2 && (
                   <AnimatePresence>
                     <motion.div
                       initial={{ opacity: 0, y: -50 }}
@@ -400,10 +364,10 @@ const AccountManagement = () => {
                           </tbody>
                         </table>
                       </div>
-                      <div className="p-4 border-gray-200 dark:border-gray-700 flex justify-end space-x-2">
+                      <div className="pb-4 pr-4 border-gray-200 dark:border-gray-700 flex justify-end space-x-2">
                         <button
                           className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded px-4 py-2"
-                          onClick={closeModal3}
+                          onClick={closeModal2}
                         >
                           Cancel
                         </button>
@@ -417,146 +381,13 @@ const AccountManagement = () => {
                     </motion.div>
                   </AnimatePresence>
                 )}
-                <button onClick={openModal1} className="hover:text-primary-600">
-                  <svg
-                    className="fill-current"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                  >
-                    <polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon>
-                  </svg>
-                </button>
               </div>
             </div>
           </div>
         ))}
+
         <AnimatePresence>
           {isModalOpen1 && (
-            <motion.div
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              transition={{ duration: 0.3 }}
-              className="fixed top-0 right-0 left-0 z-50 justify-center items-center w-full h-full overflow-y-auto overflow-x-hidden"
-            >
-              <div
-                id="authentication-modal"
-                tabIndex="-1"
-                aria-hidden="true"
-                className="fixed top-0 right-0 left-0 z-50 justify-center items-center w-full h-full overflow-y-auto overflow-x-hidden"
-              >
-                <div className="relative p-4 w-full max-w-md max-h-full mx-auto mt-20">
-                  <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                    <div className="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
-                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Update Profile</h3>
-                      <button
-                        type="button"
-                        className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                        onClick={closeModal1}
-                      >
-                        <svg
-                          className="w-3 h-3"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 14 14"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M1 1l6 6m0 0l6 6M7 7l6-6M7 7L1 1"
-                          />
-                        </svg>
-                        <span className="sr-only">Close modal</span>
-                      </button>
-                    </div>
-                    <div className="p-4">
-                      <form className="space-y-4" onSubmit={handleSubmit}>
-                        <div>
-                          <label
-                            htmlFor="first_name"
-                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                          >
-                            Enter first name
-                          </label>
-                          <input
-                            type="text"
-                            name="first_name"
-                            id="first_name"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            value={formData1.first_name}
-                            onChange={handleInputChange1}
-                          />
-                        </div>
-                        <div>
-                          <label
-                            htmlFor="last_name"
-                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                          >
-                            Enter last name
-                          </label>
-                          <input
-                            type="text"
-                            name="last_name"
-                            id="last_name"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            value={formData1.last_name}
-                            onChange={handleInputChange1}
-                          />
-                        </div>
-
-                        <div>
-                          <label
-                            htmlFor="phone_number"
-                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                          >
-                            Enter phone number
-                          </label>
-                          <input
-                            type="text"
-                            name="phone_number"
-                            id="phone_number"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            value={formData1.phone_number}
-                            onChange={handleInputChange1}
-                          />
-                        </div>
-                        <div>
-                          <label
-                            htmlFor="date_of_birth"
-                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                          >
-                            Enter date of birth
-                          </label>
-                          <input
-                            type="date"
-                            name="date_of_birth"
-                            id="date_of_birth"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            value={formData1.date_of_birth}
-                            onChange={handleInputChange1}
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                        >
-                          Update Profile
-                        </button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <AnimatePresence>
-          {isModalOpen2 && (
             <motion.div
               initial={{ opacity: 0, y: -50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -577,7 +408,7 @@ const AccountManagement = () => {
                       <button
                         type="button"
                         className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                        onClick={closeModal2}
+                        onClick={closeModal1}
                       >
                         <svg
                           className="w-3 h-3"

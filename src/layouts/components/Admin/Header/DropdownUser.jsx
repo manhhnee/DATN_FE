@@ -24,7 +24,6 @@ const DropdownUser = () => {
       try {
         const response = await axiosInstance.get(`/users/${userId}`);
         setUser(response.data.data);
-        console.log(response.data.data);
       } catch (error) {
         console.error('Error getting user', error);
       }
@@ -138,7 +137,7 @@ const DropdownUser = () => {
           </li>
           <li>
             <Link
-              to="/pages/settings"
+              to={config.routes.adminSetting}
               className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
             >
               <svg
