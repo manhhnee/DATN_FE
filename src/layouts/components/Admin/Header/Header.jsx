@@ -49,7 +49,6 @@ const Header = (props) => {
               </span>
             </span>
           </button>
-          {/* <!-- Hamburger Toggle BTN --> */}
 
           <Link className="block flex-shrink-0 lg:hidden" to="/">
             <img src={LogoIcon} alt="Logo" />
@@ -58,7 +57,6 @@ const Header = (props) => {
 
         <div className="flex items-center gap-3 2xsm:gap-7 ml-auto">
           <ul className="flex items-center gap-2 2xsm:gap-4">
-            {/* <!-- Dark Mode Toggler --> */}
             <DarkModeSwitcher />
           </ul>
           <DropdownUser />

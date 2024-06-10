@@ -1,13 +1,16 @@
 import React, { useRef, useCallback, useState } from 'react';
 import Webcam from 'react-webcam';
-import axios from 'axios';
+import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 
+import axiosInstance from '../../axiosConfig/axiosConfig';
 import Popup from '~/components/Popup';
 
 const Capture = () => {
+  const params = useParams();
+
   const webcamRef = useRef(null);
   const [message, setMessage] = useState('');
   const [capturing, setCapturing] = useState(false);
@@ -22,12 +25,11 @@ const Capture = () => {
     while (count < maxCaptures) {
       const imageSrc = webcamRef.current.getScreenshot();
       try {
-        const response = await axios.post('http://localhost:3000/api/v1/generate_dataset/15', {
+        await axiosInstance.post(`http://localhost:3000/api/v1/generate_dataset/${params['user_id']}`, {
           image: imageSrc,
           frame: count,
         });
         setCaptureCount(count + 1);
-        console.log(count);
       } catch (error) {
         console.error('Error:', error);
         setMessage('Failed to generate dataset.');
@@ -35,18 +37,22 @@ const Capture = () => {
         return;
       }
       count++;
-      await new Promise((resolve) => setTimeout(resolve, 200)); // Delay to capture next frame
+      await new Promise((resolve) => setTimeout(resolve, 200));
     }
     setMessage('Dataset generated successfully.');
     setCapturing(false);
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 3000);
-  }, [webcamRef]);
+  }, [params]);
 
   return (
-    <>
+    <div className="flex items-center justify-center">
       <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" width={640} height={480} />
-      <button onClick={capture} disabled={capturing}>
+      <button
+        onClick={capture}
+        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ml-8"
+        disabled={capturing}
+      >
         {capturing ? `Capturing ${captureCount}/${maxCaptures}` : 'Capture photos'}
       </button>
       <AnimatePresence>
@@ -62,7 +68,7 @@ const Capture = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 };
 

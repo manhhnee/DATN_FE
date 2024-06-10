@@ -9,7 +9,9 @@ const VerticalNav = () => {
 
   return (
     <div className="flex">
-      <div className={` ${open ? 'w-72' : 'w-20 '} bg-dark-purple h-screen p-5  pt-8 relative duration-300`}>
+      <div
+        className={` ${open ? 'w-72' : 'w-20 '} bg-primary-900 h-screen p-5  pt-8 relative duration-300 dark:bg-boxdark dark:drop-shadow-none`}
+      >
         <FontAwesomeIcon
           className={`absolute cursor-pointer -right-2 top-11 border-dark-purple
           border-2 rounded-full text-white text-2xl  ${!open && 'rotate-180'}`}

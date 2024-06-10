@@ -1,9 +1,33 @@
+import React, { useContext, useEffect, useState } from 'react';
+
 import Breadcrumb from '~/components/Breadcrumbs';
+import axiosInstance from '~/axiosConfig/axiosConfig';
 import AdminLayouts from '~/layouts/AdminLayouts/AdminLayouts';
 import CoverOne from '~/images/cover/cover-01.png';
+import GlobalContext from '~/context/GlobalContext';
 import userSix from '~/images/user/user-06.png';
 
 const AdminProfile = () => {
+  const { userId } = useContext(GlobalContext);
+  const [user, setUser] = useState([]);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axiosInstance.get(`/users/${userId}`);
+        if (response.data) {
+          setUser(response.data.data);
+        }
+      } catch (error) {
+        console.error('Fetch user error:', error);
+      }
+    };
+
+    fetchUser();
+  }, [userId]);
+
+  const getFullName = (first_name, last_name) => `${first_name} ${last_name}`;
+
   return (
     <AdminLayouts>
       <Breadcrumb pageName="Profile" />
@@ -18,8 +42,12 @@ const AdminProfile = () => {
         </div>
         <div className="px-4 pb-6 text-center lg:pb-8 xl:pb-11.5">
           <div className="relative z-30 mx-auto -mt-22 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 sm:h-44 sm:max-w-44 sm:p-3">
-            <div className="relative drop-shadow-2">
-              <img src={userSix} alt="profile" />
+            <div className="relative drop-shadow-2 h-full">
+              <img
+                src={user && user.avatar_url ? `http://localhost:3000/${user.avatar_url}` : userSix}
+                alt="User"
+                className="rounded-full h-full w-full"
+              />
               <label
                 htmlFor="profile"
                 className="absolute bottom-0 right-0 flex h-8.5 w-8.5 cursor-pointer items-center justify-center rounded-full bg-primary-700 text-white hover:bg-opacity-90 sm:bottom-2 sm:right-2"
@@ -50,13 +78,14 @@ const AdminProfile = () => {
             </div>
           </div>
           <div className="mt-4">
-            <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">Danish Heilium</h3>
+            <h3 className="mb-1.5 text-2xl font-semibold text-black dark:text-white">
+              {getFullName(user.first_name, user.last_name)}
+            </h3>
             <div className="mx-auto max-w-180">
               <h4 className="font-semibold text-black dark:text-white">About Me</h4>
-              <p className="mt-4.5 text-graydark">Email: manh123@gmail.com</p>
-              <p className="mt-4.5 text-graydark">Name: Nguyen Duc Manh</p>
-              <p className="mt-4.5 text-graydark">Phone number: 0987654321</p>
-              <p className="mt-4.5 text-graydark">Date of birth: 0987654321</p>
+              <p className="mt-4.5 text-graydark dark:text-white">Email: {user.email}</p>
+              <p className="mt-4.5 text-graydark dark:text-white">Phone number: {user.phone_number}</p>
+              <p className="mt-4.5 text-graydark dark:text-white">Date of birth: {user.date_of_birth}</p>
             </div>
           </div>
         </div>

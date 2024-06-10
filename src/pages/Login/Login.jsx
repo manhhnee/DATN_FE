@@ -3,6 +3,7 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GlobalContext from '~/context/GlobalContext';
 import Cookies from 'js-cookie';
+import axiosInstance from '../../axiosConfig/axiosConfig';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -16,7 +17,7 @@ function Login() {
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://127.0.0.1:3000/api/v1/login', {
+      const response = await axiosInstance.post('http://127.0.0.1:3000/api/v1/login', {
         email: email,
         password: password,
         remember: rememberMe,
@@ -71,7 +72,7 @@ function Login() {
                       Remember me
                     </label>
                   </div>
-                  <button className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
+                  <button className="mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
                     <svg
                       className="w-6 h-6 -ml-2"
                       fill="none"

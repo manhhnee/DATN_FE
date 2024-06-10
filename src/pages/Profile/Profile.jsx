@@ -69,7 +69,7 @@ const Profile = () => {
     }
 
     try {
-      await axiosInstance.put(`/users/${userId}`, updateData, {
+      await axiosInstance.put(`/users/${userId}/update_user`, updateData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -101,7 +101,10 @@ const Profile = () => {
   return (
     <div
       className={`font-sans antialiased leading-normal tracking-wider bg-cover text-gray-100 w-full`}
-      style={{ backgroundImage: "url('https://source.unsplash.com/1L71sPT5XKc')" }}
+      style={{
+        backgroundImage:
+          "url('https://www.desktopbackground.org/download/2048x1152/2012/04/02/368242_medieval-wallpapers-backgrounds-with-quality-hd_2500x1562_h.jpg')",
+      }}
     >
       <div className=" w-full flex items-center h-auto lg:h-screen flex-wrap mx-auto my-32 lg:my-0">
         <div

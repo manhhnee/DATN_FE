@@ -50,14 +50,13 @@ function RoutesComponent() {
             key={index}
             path={route.path}
             element={
-              <Layout>
-                <Page />
-              </Layout>
-              // localStorage.getItem('Role') === 'admin' ? (
-
-              // ) : (
-              //   <Navigate to="/login"></Navigate>
-              // )
+              localStorage.getItem('Role') === 'admin' ? (
+                <Layout>
+                  <Page />
+                </Layout>
+              ) : (
+                <Navigate to="/login"></Navigate>
+              )
             }
           />
         );

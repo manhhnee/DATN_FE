@@ -41,7 +41,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
         <NavLink to={config.routes.dashboard}>
-          <img src={Logo} alt="Logo" />
+          <h2 className="text-white ml-4 text-title-xl2 font-semibold">Admin Page</h2>
         </NavLink>
 
         <button
@@ -184,7 +184,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
               <li>
                 <NavLink
-                  to="/settings"
+                  to={config.routes.adminSetting}
                   className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
                     pathname.includes('settings') && 'bg-graydark dark:bg-meta-4'
                   }`}

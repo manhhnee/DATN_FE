@@ -9,15 +9,16 @@ import logo from '~/assets/logo.png';
 import GlobalContext from '~/context/GlobalContext';
 import axiosInstance from '~/axiosConfig/axiosConfig';
 import routes from '~/config/routes';
+import DarkModeSwitcher from '~/layouts/components/Admin/Header/DarkModeSwitcher';
 
 import styles from './Header.module.scss';
-import axios from 'axios';
 
 const cx = classNames.bind(styles);
 
 function Header() {
   const navigate = useNavigate();
-  const { isLoggedIn, setIsLoggedIn, userId, monthIndex, setMonthIndex } = useContext(GlobalContext);
+  const { isLoggedIn, setIsLoggedIn, userId, setUserId, setRole, monthIndex, setMonthIndex } =
+    useContext(GlobalContext);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,8 +60,10 @@ function Header() {
 
   const handleLogout = async () => {
     try {
-      await axios.delete('http://127.0.0.1:3000/api/v1/logout');
+      await axiosInstance.delete('http://127.0.0.1:3000/api/v1/logout');
       setIsLoggedIn(false);
+      setRole('');
+      setUserId('');
       navigate('/login');
     } catch (error) {
       console.error('Logout error:', error);
@@ -76,20 +79,20 @@ function Header() {
   };
 
   return (
-    <header className="px-4 py-2 flex items-center justify-center">
+    <header className="px-4 py-2 flex items-center justify-center dark:bg-boxdark dark:drop-shadow-none">
       <img src={logo} alt="calendar" className="mr-2 w-12 h-12" />
-      <h1 className="mr-10 text-xl text-gray-500 font-bold">Calendar</h1>
+      <h1 className="mr-10 text-xl text-gray-500 font-bold dark:text-gray-200">Calendar</h1>
       <button onClick={handleReset} className={cx('btn-today')}>
         Today
       </button>
 
-      <button dir="ltr" onClick={handlePrevMonth} className="rounded-s-lg hover:bg-gray-200">
-        <span className="material-icons-outlined cursor-pointer text-gray-600 mx-2">chevron_left</span>
+      <button dir="ltr" onClick={handlePrevMonth} className="rounded-s-lg hover:bg-gray-200 dark:hover:bg-black">
+        <span className="material-icons-outlined cursor-pointer text-gray-600 mx-2 dark:text-white">chevron_left</span>
       </button>
-      <button dir="rtl" onClick={handleNextMonth} className="rounded-s-lg hover:bg-gray-200">
-        <span className="material-icons-outlined cursor-pointer text-gray-600 mx-2">chevron_right</span>
+      <button dir="rtl" onClick={handleNextMonth} className="rounded-s-lg hover:bg-gray-200 dark:hover:bg-black">
+        <span className="material-icons-outlined cursor-pointer text-gray-600 mx-2 dark:text-white">chevron_right</span>
       </button>
-      <h2 className="mt-auto mb-auto text-xl ml-3 text-gray-500 font-bold">
+      <h2 className="mt-auto mb-auto text-xl ml-3 text-gray-500 font-bold dark:text-gray-300">
         {dayjs(new Date(dayjs().year(), monthIndex)).format('MMMM YYYY')}
       </h2>
 
@@ -220,6 +223,10 @@ function Header() {
           </button>
         </div>
       )}
+
+      <ul className="mx-4">
+        <DarkModeSwitcher />
+      </ul>
     </header>
   );
 }

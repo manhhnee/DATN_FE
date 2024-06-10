@@ -1,13 +1,36 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useRef, useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 import config from '~/config';
 import UserOne from '~/images/user/user-01.png';
+import axiosInstance from '~/axiosConfig';
+import globalContext from '~/context/GlobalContext';
+
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const { setIsLoggedIn, userId, setUserId, setRole } = useContext(globalContext);
 
   const trigger = useRef(null);
   const dropdown = useRef(null);
+
+  const [user, setUser] = useState([]);
+
+  const getFullName = (first_name, last_name) => `${first_name} ${last_name}`;
+
+  useEffect(() => {
+    const fetchAvatarUser = async () => {
+      try {
+        const response = await axiosInstance.get(`/users/${userId}`);
+        setUser(response.data.data);
+        console.log(response.data.data);
+      } catch (error) {
+        console.error('Error getting user', error);
+      }
+    };
+    fetchAvatarUser();
+  }, [userId]);
 
   // close on click outside
   useEffect(() => {
@@ -32,16 +55,34 @@ const DropdownUser = () => {
     return () => document.removeEventListener('keydown', keyHandler);
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await axiosInstance.delete('http://127.0.0.1:3000/api/v1/logout');
+      setIsLoggedIn(false);
+      setRole('');
+      setUserId('');
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   return (
     <div className="relative">
       <Link ref={trigger} onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center gap-4" to="#">
         <span className="hidden text-right lg:block">
-          <span className="block text-sm font-medium text-black dark:text-white">Thomas Anree</span>
+          <span className="block text-sm font-medium text-black dark:text-white">
+            {getFullName(user.first_name, user.last_name)}
+          </span>
           <span className="block text-xs">UX Designer</span>
         </span>
 
-        <span className="h-12 w-12 rounded-full">
-          <img src={UserOne} alt="User" />
+        <span className="h-12 w-12 rounded-full content-center">
+          <img
+            src={user && user.avatar_url ? `http://localhost:3000/${user.avatar_url}` : UserOne}
+            alt="User"
+            className="rounded-full h-full w-full"
+          />
         </span>
 
         <svg
@@ -121,7 +162,10 @@ const DropdownUser = () => {
             </Link>
           </li>
         </ul>
-        <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+        <button
+          onClick={() => handleLogout()}
+          className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+        >
           <svg
             className="fill-current"
             width="22"
