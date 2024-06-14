@@ -4,7 +4,7 @@ import config from '~/config';
 import Home from '~/pages/Home';
 import Login from '~/pages/Login';
 import Profile from '~/pages/Profile';
-// Admin Pages
+//admin
 import Dashboard from '~/pages/Dashboard';
 import Calendar from '~/pages/Calendar';
 import AdminProfile from '~/pages/AdminProfile';
@@ -19,7 +19,6 @@ const publicRoutes = [
   { path: config.routes.profile, component: Profile },
 ];
 
-// Admin routes
 const adminRoutes = [
   { path: config.routes.dashboard, component: Dashboard, layout: null },
   { path: config.routes.calendar, component: Calendar, layout: null },
