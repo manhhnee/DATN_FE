@@ -209,7 +209,7 @@ const AccountManagement = () => {
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex items-center py-6 px-4 md:px-6 xl:px-7.5">
           <h4 className="text-xl font-semibold text-black dark:text-white">List Account</h4>
-          <button
+          {/* <button
             type="button"
             onClick={handleTrainData}
             className="ml-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -231,7 +231,7 @@ const AccountManagement = () => {
               <line x1="8" y1="12" x2="16" y2="12"></line>
             </svg>
             Train data
-          </button>
+          </button> */}
           <button
             type="button"
             onClick={openModal1}
