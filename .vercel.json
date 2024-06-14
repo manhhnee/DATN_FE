@@ -9,8 +9,5 @@
       }
     }
   ],
-  "routes": [
-    { "src": "/manifest.json", "dest": "/manifest.json" },
-    { "src": "/(.*)", "dest": "/index.html" }
-  ]
+  "routes": [{ "src": "/(.*)", "dest": "/index.html" }]
 }
