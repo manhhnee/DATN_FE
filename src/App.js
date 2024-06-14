@@ -15,7 +15,13 @@ function RoutesComponent() {
     <Routes>
       {publicRoutes.map((route, index) => {
         const Page = route.component;
-        let Layout = route.layout ?? DefaultLayout;
+
+        let Layout = DefaultLayout;
+        if (route.layout) {
+          Layout = route.layout;
+        } else if (route.layout === null) {
+          Layout = Fragment;
+        }
 
         return (
           <Route
@@ -29,11 +35,15 @@ function RoutesComponent() {
           />
         );
       })}
-
       {adminRoutes.map((route, index) => {
         const Page = route.component;
-        let Layout = route.layout ?? DefaultLayout;
 
+        let Layout = DefaultLayout;
+        if (route.layout) {
+          Layout = route.layout;
+        } else if (route.layout === null) {
+          Layout = Fragment;
+        }
         return (
           <Route
             key={index}
@@ -44,7 +54,7 @@ function RoutesComponent() {
                   <Page />
                 </Layout>
               ) : (
-                <Navigate to="/login" replace />
+                <Navigate to="/login"></Navigate>
               )
             }
           />
