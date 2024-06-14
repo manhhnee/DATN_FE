@@ -1,9 +1,8 @@
 import { Fragment, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
-import { publicRoutes } from '~/routes';
+import { publicRoutes, adminRoutes } from '~/routes';
 import { DefaultLayout } from '~/layouts';
 import Loader from '~/common/Loader';
-import { adminRoutes } from './routes/routes';
 
 function RoutesComponent() {
   const { pathname } = useLocation();
@@ -16,13 +15,7 @@ function RoutesComponent() {
     <Routes>
       {publicRoutes.map((route, index) => {
         const Page = route.component;
-
-        let Layout = DefaultLayout;
-        if (route.layout) {
-          Layout = route.layout;
-        } else if (route.layout === null) {
-          Layout = Fragment;
-        }
+        let Layout = route.layout ?? DefaultLayout;
 
         return (
           <Route
@@ -36,15 +29,11 @@ function RoutesComponent() {
           />
         );
       })}
+
       {adminRoutes.map((route, index) => {
         const Page = route.component;
+        let Layout = route.layout ?? DefaultLayout;
 
-        let Layout = DefaultLayout;
-        if (route.layout) {
-          Layout = route.layout;
-        } else if (route.layout === null) {
-          Layout = Fragment;
-        }
         return (
           <Route
             key={index}
@@ -55,7 +44,7 @@ function RoutesComponent() {
                   <Page />
                 </Layout>
               ) : (
-                <Navigate to="/login"></Navigate>
+                <Navigate to="/login" replace />
               )
             }
           />
