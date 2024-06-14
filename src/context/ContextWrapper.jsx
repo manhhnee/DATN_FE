@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useReducer, useMemo } from 'react';
 import GlobalContext from './GlobalContext';
 import dayjs from 'dayjs';
+import axiosInstance from '~/axiosConfig'; // Import axiosInstance
 
 function savedEventsReducer(state, { type, payload }) {
   switch (type) {
@@ -10,14 +11,11 @@ function savedEventsReducer(state, { type, payload }) {
       return state.map((evt) => (evt.id === payload.id ? payload : evt));
     case 'delete':
       return state.filter((evt) => evt.id !== payload.id);
+    case 'set':
+      return payload; // Add this case to set the initial fetched events
     default:
       throw new Error();
   }
-}
-function initEvents() {
-  const storageEvents = localStorage.getItem('savedEvents');
-  const parsedEvents = storageEvents ? JSON.parse(storageEvents) : [];
-  return parsedEvents;
 }
 
 function initIsLoggedIn() {
@@ -42,7 +40,7 @@ export default function ContextWrapper(props) {
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [labels, setLabels] = useState([]);
-  const [savedEvents, dispatchCalEvent] = useReducer(savedEventsReducer, [], initEvents);
+  const [savedEvents, dispatchCalEvent] = useReducer(savedEventsReducer, []);
   const [isLoggedIn, setIsLoggedIn] = useState(initIsLoggedIn);
   const [userId, setUserId] = useState(initUserId);
   const [role, setRole] = useState(initRole);
@@ -95,6 +93,22 @@ export default function ContextWrapper(props) {
       setSelectedEvent(null);
     }
   }, [showEventModal]);
+
+  useEffect(() => {
+    async function fetchNotes() {
+      try {
+        const response = await axiosInstance.get(`/users/${userId}/notes`);
+        const fetchedNotes = response.data.data;
+        dispatchCalEvent({ type: 'set', payload: fetchedNotes });
+      } catch (error) {
+        console.error('Error fetching notes:', error);
+      }
+    }
+
+    if (isLoggedIn && userId) {
+      fetchNotes();
+    }
+  }, [isLoggedIn, userId]);
 
   function updateLabel(label) {
     setLabels(labels.map((lbl) => (lbl.label === label.label ? label : lbl)));

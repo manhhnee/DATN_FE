@@ -32,6 +32,7 @@ const AccountManagement = () => {
     phone_number: '',
     date_of_birth: '',
     avatar: null,
+    basic_salary: '',
   });
 
   useEffect(() => {
@@ -47,9 +48,11 @@ const AccountManagement = () => {
   useEffect(() => {
     const fetchAttendanceByID = async () => {
       try {
-        const response = await axiosInstance.get(`/users/${userId}/attendances`);
-        console.log(response.data);
-        setAttendances(response.data);
+        if (userId) {
+          const response = await axiosInstance.get(`/users/${userId}/attendances`);
+          console.log(response.data);
+          setAttendances(response.data);
+        }
       } catch (error) {
         console.error("Fetch user's attendance error:", error);
       }
@@ -111,6 +114,19 @@ const AccountManagement = () => {
         console.log(error.response.data);
       } else {
         console.error('Delete user error:', error);
+      }
+    }
+  };
+
+  const handleTrainData = async () => {
+    try {
+      const reponse = await axiosInstance.post('/train_classifier');
+      console.log(reponse.data);
+    } catch (error) {
+      if (error.response && error.response.status === 422) {
+        console.log(error.response.data);
+      } else {
+        console.error('Train data user error:', error);
       }
     }
   };
@@ -180,9 +196,10 @@ const AccountManagement = () => {
 
   const formatTime = (isoString) => {
     const date = new Date(isoString);
-    const hours = date.getUTCHours().toString().padStart(2, '0');
-    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-    const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+    const vnDate = new Date(date.getTime() + 7 * 60 * 60 * 1000);
+    const hours = vnDate.getUTCHours().toString().padStart(2, '0');
+    const minutes = vnDate.getUTCMinutes().toString().padStart(2, '0');
+    const seconds = vnDate.getUTCSeconds().toString().padStart(2, '0');
     return `${hours}:${minutes}:${seconds}`;
   };
 
@@ -194,8 +211,31 @@ const AccountManagement = () => {
           <h4 className="text-xl font-semibold text-black dark:text-white">List Account</h4>
           <button
             type="button"
-            onClick={openModal1}
+            onClick={handleTrainData}
             className="ml-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            <svg
+              className="fill-current mr-2"
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#000000"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            Train data
+          </button>
+          <button
+            type="button"
+            onClick={openModal1}
+            className="ml-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
             <svg
               className="fill-current mr-2"
@@ -342,7 +382,7 @@ const AccountManagement = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -50 }}
                       transition={{ duration: 0.3 }}
-                      className="fixed top-1/3 left-1/3 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white shadow-1 w-180 rounded-lg overflow-auto"
+                      className="fixed top-1/3 left-1/3  z-50 bg-white shadow-1 w-180 rounded-lg overflow-auto"
                     >
                       <div className="p-4">
                         <table className="w-full text-sm text-left text-gray-500">
@@ -529,6 +569,23 @@ const AccountManagement = () => {
                             id="date_of_birth"
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
                             value={formData2.date_of_birth}
+                            onChange={handleInputChange2}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="basic_salary"
+                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                          >
+                            Enter basic salary
+                          </label>
+                          <input
+                            type="text"
+                            name="basic_salary"
+                            id="basic_salary"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            value={formData2.basic_salary}
                             onChange={handleInputChange2}
                             required
                           />

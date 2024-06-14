@@ -32,7 +32,7 @@ function Day({ day, rowIdx }) {
     const dateString = day.format('YYYY-MM-DD');
     if (attendanceData.hasOwnProperty(dateString)) {
       const { time_worked } = attendanceData[dateString];
-      return time_worked >= 8 ? 'bg-green-300 dark:bg-green-600' : 'bg-red-500 dark:bg-red-800';
+      return time_worked >= 8 ? 'bg-green-400 dark:bg-green-600' : 'bg-red-400 dark:bg-red-800';
     }
     return '';
   }

@@ -1,10 +1,11 @@
 import React, { useContext, useState } from 'react';
 import GlobalContext from '~/context/GlobalContext';
+import axiosInstance from '~/axiosConfig';
 
 const labelsClasses = ['indigo', 'gray', 'green', 'blue', 'red', 'purple'];
 
 function EventModal() {
-  const { setShowEventModal, daySelected, dispatchCalEvent, selectedEvent } = useContext(GlobalContext);
+  const { setShowEventModal, daySelected, dispatchCalEvent, selectedEvent, userId } = useContext(GlobalContext);
 
   const [title, setTitle] = useState(selectedEvent ? selectedEvent.title : '');
   const [description, setDescription] = useState(selectedEvent ? selectedEvent.description : '');
@@ -12,23 +13,45 @@ function EventModal() {
     selectedEvent ? labelsClasses.find((lbl) => lbl === selectedEvent.label) : labelsClasses[0],
   );
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const calendarEvent = {
       title,
       description,
       label: selectedLabel,
-      day: daySelected.valueOf(),
-      id: selectedEvent ? selectedEvent.id : Date.now(),
+      day: daySelected.format('YYYY-MM-DD'),
     };
-    if (selectedEvent) {
-      dispatchCalEvent({ type: 'update', payload: calendarEvent });
-    } else {
-      dispatchCalEvent({ type: 'push', payload: calendarEvent });
-    }
 
-    setShowEventModal(false);
+    try {
+      if (selectedEvent) {
+        // Update existing note
+        await axiosInstance.put(`/users/${userId}/notes/${selectedEvent.id}`, {
+          note: calendarEvent,
+        });
+        dispatchCalEvent({ type: 'update', payload: { ...calendarEvent, id: selectedEvent.id } });
+      } else {
+        // Create new note
+        const response = await axiosInstance.post(`/users/${userId}/notes`, {
+          note: calendarEvent,
+        });
+        dispatchCalEvent({ type: 'push', payload: response.data });
+      }
+      setShowEventModal(false);
+    } catch (error) {
+      console.error('Error saving note:', error);
+    }
   }
+
+  async function handleDelete() {
+    try {
+      await axiosInstance.delete(`/users/${userId}/notes/${selectedEvent.id}`);
+      dispatchCalEvent({ type: 'delete', payload: selectedEvent });
+      setShowEventModal(false);
+    } catch (error) {
+      console.error('Error deleting note:', error);
+    }
+  }
+
   return (
     <div className="h-screen w-full fixed left-0 top-0 flex justify-center items-center">
       <form className="bg-white rounded-lg shadow-2xl w-1/4">
@@ -36,16 +59,7 @@ function EventModal() {
           <span className="material-icons-outlined text-gray-400">drag_handle</span>
           <div>
             {selectedEvent && (
-              <span
-                onClick={() => {
-                  dispatchCalEvent({
-                    type: 'delete',
-                    payload: selectedEvent,
-                  });
-                  setShowEventModal(false);
-                }}
-                className="material-icons-outlined text-gray-400 cursor-pointer"
-              >
+              <span onClick={handleDelete} className="material-icons-outlined text-gray-400 cursor-pointer">
                 delete
               </span>
             )}

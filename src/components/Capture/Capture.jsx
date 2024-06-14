@@ -1,22 +1,24 @@
 import React, { useRef, useCallback, useState } from 'react';
 import Webcam from 'react-webcam';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck } from '@fortawesome/free-solid-svg-icons';
 
 import axiosInstance from '../../axiosConfig/axiosConfig';
 import Popup from '~/components/Popup';
+import config from '~/config';
 
 const Capture = () => {
   const params = useParams();
+  const navigate = useNavigate();
 
   const webcamRef = useRef(null);
   const [message, setMessage] = useState('');
   const [capturing, setCapturing] = useState(false);
   const [captureCount, setCaptureCount] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
-  const maxCaptures = 100;
+  const maxCaptures = 50;
 
   const capture = useCallback(async () => {
     setCapturing(true);
@@ -37,13 +39,17 @@ const Capture = () => {
         return;
       }
       count++;
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
     setMessage('Dataset generated successfully.');
     setCapturing(false);
     setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
-  }, [params]);
+    setTimeout(() => {
+      setShowSuccess(false);
+      navigate(config.routes.accountManagement);
+    }, 3000);
+    navigate(config.routes.accountManagement);
+  }, [params, navigate]);
 
   return (
     <div className="flex items-center justify-center">
@@ -62,7 +68,7 @@ const Capture = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-0 right-0 left-0 z-50 flex justify-center items-center p-4"
+            className="fixed top-20 right-0 left-0 z-50 flex justify-center items-center p-4"
           >
             <Popup icon={<FontAwesomeIcon icon={faCircleCheck} />} children={message} />
           </motion.div>

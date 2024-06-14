@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCakeCandles, faCheckCircle, faEnvelope, faMobile } from '@fortawesome/free-solid-svg-icons';
 import { motion, AnimatePresence } from 'framer-motion';
+import bgProfile from '~/assets/bg-profile.jpg';
 
 import GlobalContext from '~/context/GlobalContext';
 import axiosInstance from '~/axiosConfig/axiosConfig';
@@ -102,8 +103,7 @@ const Profile = () => {
     <div
       className={`font-sans antialiased leading-normal tracking-wider bg-cover text-gray-100 w-full`}
       style={{
-        backgroundImage:
-          "url('https://www.desktopbackground.org/download/2048x1152/2012/04/02/368242_medieval-wallpapers-backgrounds-with-quality-hd_2500x1562_h.jpg')",
+        backgroundImage: `url(${bgProfile})`,
       }}
     >
       <div className=" w-full flex items-center h-auto lg:h-screen flex-wrap mx-auto my-32 lg:my-0">

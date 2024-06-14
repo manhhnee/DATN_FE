@@ -2,21 +2,21 @@ import config from '~/config';
 
 // Pages
 import Home from '~/pages/Home';
-import Login from '../pages/Login';
+import Login from '~/pages/Login';
 import Profile from '~/pages/Profile';
 //admin
-import Dashboard from '../pages/Dashboard';
-import Calendar from '../pages/Calendar';
-import AdminProfile from '../pages/AdminProfile';
-import AccountManagement from '../pages/AccountManagement';
-import CapturePage from '../pages/CapturePage';
-import AdminSetting from '../pages/AdminSetting';
+import Dashboard from '~/pages/Dashboard';
+import Calendar from '~/pages/Calendar';
+import AdminProfile from '~/pages/AdminProfile';
+import AccountManagement from '~/pages/AccountManagement';
+import CapturePage from '~/pages/CapturePage';
+import AdminSetting from '~/pages/AdminSetting';
 
 // Public routes
 const publicRoutes = [
-  { path: '/', component: Home },
+  { path: config.routes.home, component: Home },
   { path: config.routes.login, component: Login, layout: null },
-  { path: '/profile', component: Profile },
+  { path: config.routes.profile, component: Profile },
 ];
 
 const adminRoutes = [

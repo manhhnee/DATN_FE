@@ -19,7 +19,7 @@ function getMonth(month = dayjs().month()) {
 
 function Home() {
   const [currenMonth, setCurrentMonth] = useState(getMonth());
-  const { monthIndex, showEventModal } = useContext(GlobalContext);
+  const { monthIndex } = useContext(GlobalContext);
 
   useEffect(() => {
     setCurrentMonth(getMonth(monthIndex));

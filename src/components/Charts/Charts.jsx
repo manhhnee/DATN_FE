@@ -69,7 +69,7 @@ const Charts = () => {
             options: {
               ...prevState.options,
               labels: labels,
-              colors: generateRandomColors(series.length),
+              colors: generateRandomColors(series),
             },
           }));
         } else {
@@ -106,17 +106,18 @@ const Charts = () => {
       </div>
 
       <div className="-mx-8 flex flex-wrap items-center justify-center gap-y-3">
-        {state.options.labels.map((label, index) => (
-          <div key={index} className="sm:w-1/2 w-full px-8">
-            <div className="flex w-full items-center">
-              <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-primary"></span>
-              <p className="flex w-full justify-between text-sm font-medium text-black dark:text-white">
-                <span>{label}</span>
-                <span>{state.series[index]} hours</span>
-              </p>
+        {state.options.labels &&
+          state.options.labels.map((label, index) => (
+            <div key={index} className="sm:w-1/2 w-full px-8">
+              <div className="flex w-full items-center">
+                <span className="mr-2 block h-3 w-full max-w-3 rounded-full bg-primary"></span>
+                <p className="flex w-full justify-between text-sm font-medium text-black dark:text-white">
+                  <span>{label}</span>
+                  <span>{state.series[index]} hours</span>
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ function Login() {
       setIsLoggedIn(true);
       setUserId(response.data.user_id);
       setRole(response.data.role);
-      navigate('/');
+      navigate('/home');
     } catch (error) {
       console.error('Login error:', error);
       setErrorMessage(error.response?.data?.error || 'An unexpected error occurred. Please try again later.');

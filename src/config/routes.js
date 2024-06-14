@@ -1,8 +1,9 @@
 const routes = {
   //header
-  home: '/',
+  home: '/home',
   login: '/login',
   profile: '/profile',
+  history: '/history',
 
   //adminRoutes
   dashboard: '/admin/dashboard',

@@ -4,12 +4,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence } from 'framer-motion';
 import Webcam from 'react-webcam';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 import logo from '~/assets/logo.png';
 import GlobalContext from '~/context/GlobalContext';
 import axiosInstance from '~/axiosConfig/axiosConfig';
 import routes from '~/config/routes';
 import DarkModeSwitcher from '~/layouts/components/Admin/Header/DarkModeSwitcher';
+import Popup from '~/components/Popup';
 
 import styles from './Header.module.scss';
 
@@ -22,6 +25,10 @@ function Header() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [checkInTime, setCheckInTime] = useState(null);
+  const [checkOutTime, setCheckOutTime] = useState(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [message, setMessage] = useState('');
   const webcamRef = useRef(null);
 
   useEffect(() => {
@@ -78,6 +85,82 @@ function Header() {
     setIsModalOpen(false);
   };
 
+  const handleCheckInOut = async () => {
+    try {
+      const timeNow = dayjs().format('YYYY-MM-DDTHH:mm:ssZ');
+      console.log(timeNow);
+
+      if (!checkInTime) {
+        // Check-in
+        setCheckInTime(timeNow);
+        await axiosInstance.post(`/users/${userId}/attendances`, {
+          date: dayjs().format('YYYY-MM-DD'),
+          time_check: timeNow,
+          attendance_type_id: 1, // Assuming 1 is the ID for check-in
+        });
+        setMessage('Check-in successfully!');
+      } else {
+        // Check-out
+        setCheckOutTime(timeNow);
+        await axiosInstance.post(`/users/${userId}/attendances`, {
+          date: dayjs().format('YYYY-MM-DD'),
+          time_check: timeNow,
+          attendance_type_id: 2, // Assuming 2 is the ID for check-out
+        });
+        setMessage('Check-out successfully!');
+      }
+
+      closeModal();
+    } catch (error) {
+      console.error('Check-in/out error:', error);
+    }
+  };
+
+  const handleCheckInOutToRecognize = async () => {
+    const imageSrc = webcamRef.current.getScreenshot();
+    try {
+      const response = await axiosInstance.post('/recognize', {
+        image: imageSrc,
+      });
+      const { message, output } = response.data;
+      console.log(message);
+      console.log(output);
+
+      if (output) {
+        const user_id = output.toString().trim();
+        const timeNow = dayjs().format('YYYY-MM-DDTHH:mm:ssZ');
+
+        if (!checkInTime) {
+          setCheckInTime(timeNow);
+          await axiosInstance.post(`/users/${user_id}/attendances/create_to_recognize`, {
+            date: dayjs().format('YYYY-MM-DD'),
+            time_check: timeNow,
+            attendance_type_id: 1,
+          });
+          setMessage('Check-in successfully!');
+        } else {
+          setCheckOutTime(timeNow);
+          await axiosInstance.post(`/users/${user_id}/attendances/create_to_recognize`, {
+            date: dayjs().format('YYYY-MM-DD'),
+            time_check: timeNow,
+            attendance_type_id: 2,
+          });
+          setMessage('Check-out successfully!');
+        }
+      } else {
+        setMessage('No face detected');
+      }
+
+      setShowSuccess(true);
+
+      setTimeout(() => setShowSuccess(false), 3000);
+
+      closeModal();
+    } catch (error) {
+      console.error('Face recognition error:', error);
+    }
+  };
+
   return (
     <header className="px-4 py-2 flex items-center justify-center dark:bg-boxdark dark:drop-shadow-none">
       <img src={logo} alt="calendar" className="mr-2 w-12 h-12" />
@@ -98,8 +181,8 @@ function Header() {
 
       {isLoggedIn ? (
         <div className="ml-auto relative flex">
-          <button onClick={openModal} className={cx('btn-check')}>
-            Check
+          <button className={cx('btn-check')} onClick={handleCheckInOut}>
+            {checkInTime ? 'Check Out' : 'Check In'}
           </button>
           <button
             id="dropdownInformationButton"
@@ -162,7 +245,12 @@ function Header() {
               </div>
             </div>
           )}
-
+        </div>
+      ) : (
+        <div className="ml-auto flex gap-4 items-center">
+          <button onClick={openModal} className={cx('btn-check')}>
+            Check
+          </button>
           <AnimatePresence>
             {isModalOpen && (
               <motion.div
@@ -170,54 +258,51 @@ function Header() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -50 }}
                 transition={{ duration: 0.3 }}
-                className="fixed top-0 right-0 left-0 z-50 justify-center items-center w-full h-full overflow-y-auto overflow-x-hidden"
+                className="fixed top-80 left-0 w-full h-full z-50 flex justify-center items-center"
               >
                 <div
                   id="authentication-modal"
                   tabIndex="-1"
                   aria-hidden="true"
-                  className="fixed top-0 right-0 left-0 z-50 justify-center items-center w-full h-full overflow-y-auto overflow-x-hidden"
+                  className="relative p-4 w-full max-w-md mx-auto"
                 >
-                  <div className="relative p-4 w-full max-w-md max-h-full mx-auto mt-20">
-                    <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                      <div className="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Update Profile</h3>
-                        <button
-                          type="button"
-                          className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                          onClick={closeModal}
+                  <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                    <div className="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Check In/Out</h3>
+                      <button
+                        type="button"
+                        className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                        onClick={closeModal}
+                      >
+                        <svg
+                          className="w-3 h-3"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 14 14"
                         >
-                          <svg
-                            className="w-3 h-3"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 14 14"
-                          >
-                            <path
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M1 1l6 6m0 0l6 6M7 7l6-6M7 7L1 1"
-                            />
-                          </svg>
-                          <span className="sr-only">Close modal</span>
-                        </button>
-                      </div>
-                      <div className="p-4 md:p-5 space-y-4">
-                        <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" width={640} height={480} />
-                        <button className={cx('btn-check', 'ml-auto', 'mr-auto')}>Check</button>
-                      </div>
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M1 1l6 6m0 0l6 6M7 7l6-6M7 7L1 1"
+                          />
+                        </svg>
+                        <span className="sr-only">Close modal</span>
+                      </button>
+                    </div>
+                    <div className="p-4 md:p-5 space-y-4">
+                      <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" width={640} height={480} />
+                      <button className={cx('btn-check', 'ml-auto', 'mr-auto')} onClick={handleCheckInOutToRecognize}>
+                        {checkInTime ? 'Check Out' : 'Check In'}
+                      </button>
                     </div>
                   </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
-      ) : (
-        <div className="ml-auto">
           <button className={cx('btn-login')} onClick={() => navigate('/login')}>
             Login
           </button>
@@ -227,6 +312,19 @@ function Header() {
       <ul className="mx-4">
         <DarkModeSwitcher />
       </ul>
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.3 }}
+            className="fixed top-20 right-0 left-0 z-50 flex justify-center items-center p-4"
+          >
+            <Popup children={message} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
