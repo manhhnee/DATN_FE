@@ -308,7 +308,7 @@ const Profile = () => {
           <img
             src={
               userInfo && userInfo.avatar_url
-                ? `http://127.0.0.1:3000/${userInfo.avatar_url}`
+                ? `/${userInfo.avatar_url}`
                 : 'https://www.shutterstock.com/image-vector/blank-avatar-photo-place-holder-600nw-1114445501.jpg'
             }
             className="rounded-none lg:rounded-lg shadow-2xl hidden lg:block"

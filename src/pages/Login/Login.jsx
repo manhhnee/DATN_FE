@@ -16,7 +16,7 @@ function Login() {
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
-      const response = await axiosInstance.post('http://127.0.0.1:3000/api/v1/login', {
+      const response = await axiosInstance.post('/login', {
         email: email,
         password: password,
         remember: rememberMe,

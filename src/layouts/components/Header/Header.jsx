@@ -67,7 +67,7 @@ function Header() {
 
   const handleLogout = async () => {
     try {
-      await axiosInstance.delete('http://127.0.0.1:3000/api/v1/logout');
+      await axiosInstance.delete('/logout');
       setIsLoggedIn(false);
       setRole('');
       setUserId('');
