@@ -28,7 +28,7 @@ const Capture = () => {
       const imageSrc = webcamRef.current.getScreenshot();
       const base64Image = imageSrc.split(',')[1];
       try {
-        await axiosInstance.post(`http://localhost:3000/api/v1/generate_dataset/${params['user_id']}`, {
+        await axiosInstance.post(`http://10.10.0.124/api/v1/generate_dataset/${params['user_id']}`, {
           image: base64Image,
           frame: count,
         });

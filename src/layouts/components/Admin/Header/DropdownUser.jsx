@@ -78,7 +78,7 @@ const DropdownUser = () => {
 
         <span className="h-12 w-12 rounded-full content-center">
           <img
-            src={user && user.avatar_url ? `http://localhost:3000/${user.avatar_url}` : UserOne}
+            src={user && user.avatar_url ? `http://10.10.0.124/${user.avatar_url}` : UserOne}
             alt="User"
             className="rounded-full h-full w-full"
           />
