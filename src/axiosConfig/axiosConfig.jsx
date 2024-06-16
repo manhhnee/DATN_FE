@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://10.10.0.124/api/v1',
+  baseURL: 'https://2hm-ai-store.click/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
