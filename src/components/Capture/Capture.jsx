@@ -27,6 +27,7 @@ const Capture = () => {
     while (count < maxCaptures) {
       const imageSrc = webcamRef.current.getScreenshot();
       const base64Image = imageSrc.split(',')[1];
+      console.log(base64Image);
       try {
         await axiosInstance.post(`/generate_dataset/${params['user_id']}`, {
           image: base64Image,
