@@ -15,6 +15,7 @@ import DarkModeSwitcher from '~/layouts/components/Admin/Header/DarkModeSwitcher
 import Popup from '~/components/Popup';
 
 import styles from './Header.module.scss';
+import axios from 'axios';
 
 const cx = classNames.bind(styles);
 
@@ -118,44 +119,35 @@ function Header() {
 
   const handleCheckInOutToRecognize = async () => {
     const imageSrc = webcamRef.current.getScreenshot();
+
+    const formData = new FormData();
+    formData.append('image', imageSrc);
+
     try {
-      const response = await axiosInstance.post('/recognize', {
-        image: imageSrc,
+      const response = await axios.post('http://localhost:5000/recognize', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
-      const { message, output } = response.data;
-      console.log(message);
-      console.log(output);
 
-      if (output) {
-        const user_id = output.toString().trim();
-        const timeNow = dayjs().format('YYYY-MM-DDTHH:mm:ssZ');
+      const { recognized_id } = response.data;
 
-        if (!checkInTime) {
-          setCheckInTime(timeNow);
-          await axiosInstance.post(`/users/${user_id}/attendances/create_to_recognize`, {
-            date: dayjs().format('YYYY-MM-DD'),
-            time_check: timeNow,
-            attendance_type_id: 1,
-          });
-          setMessage('Check-in successfully!');
-        } else {
-          setCheckOutTime(timeNow);
-          await axiosInstance.post(`/users/${user_id}/attendances/create_to_recognize`, {
-            date: dayjs().format('YYYY-MM-DD'),
-            time_check: timeNow,
-            attendance_type_id: 2,
-          });
-          setMessage('Check-out successfully!');
-        }
+      if (recognized_id) {
+        const user_id = recognized_id.toString().trim();
+        const timeNow = new Date().toISOString();
+
+        // Replace with your logic to handle check-in/check-out
+        setMessage(`User recognized: ${user_id}`);
+
+        // Example logic to send attendance data
+        // await axiosInstance.post(`/users/${user_id}/attendances/create_to_recognize`, {
+        //   date: new Date().toISOString().slice(0, 10),
+        //   time_check: timeNow,
+        //   attendance_type_id: 1, // 1 for check-in, 2 for check-out
+        // });
       } else {
         setMessage('No face detected');
       }
-
-      setShowSuccess(true);
-
-      setTimeout(() => setShowSuccess(false), 3000);
-
-      closeModal();
     } catch (error) {
       console.error('Face recognition error:', error);
     }

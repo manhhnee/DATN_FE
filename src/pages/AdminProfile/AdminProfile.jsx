@@ -44,7 +44,7 @@ const AdminProfile = () => {
           <div className="relative z-30 mx-auto -mt-22 h-30 w-full max-w-30 rounded-full bg-white/20 p-1 sm:h-44 sm:max-w-44 sm:p-3">
             <div className="relative drop-shadow-2 h-full">
               <img
-                src={user && user.avatar_url ? `https://2hm-ai-store.click/${user.avatar_url}` : userSix}
+                src={user && user.avatar_url ? `http://127.0.0.1:3000/${user.avatar_url}` : userSix}
                 alt="User"
                 className="rounded-full h-full w-full"
               />
