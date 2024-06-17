@@ -4,8 +4,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence } from 'framer-motion';
 import Webcam from 'react-webcam';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 import logo from '~/assets/logo.png';
 import GlobalContext from '~/context/GlobalContext';
@@ -119,35 +117,45 @@ function Header() {
 
   const handleCheckInOutToRecognize = async () => {
     const imageSrc = webcamRef.current.getScreenshot();
-
-    const formData = new FormData();
-    formData.append('image', imageSrc);
-
+    console.log(imageSrc);
     try {
-      const response = await axios.post('http://localhost:5000/recognize', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const response = await axiosInstance.post('/recognize', {
+        image: imageSrc,
       });
+      const { message, output } = response.data;
+      console.log(message);
+      console.log(output);
 
-      const { recognized_id } = response.data;
+      if (output) {
+        const user_id = output.toString().trim();
+        const timeNow = dayjs().format('YYYY-MM-DDTHH:mm:ssZ');
 
-      if (recognized_id) {
-        const user_id = recognized_id.toString().trim();
-        const timeNow = new Date().toISOString();
-
-        // Replace with your logic to handle check-in/check-out
-        setMessage(`User recognized: ${user_id}`);
-
-        // Example logic to send attendance data
-        // await axiosInstance.post(`/users/${user_id}/attendances/create_to_recognize`, {
-        //   date: new Date().toISOString().slice(0, 10),
-        //   time_check: timeNow,
-        //   attendance_type_id: 1, // 1 for check-in, 2 for check-out
-        // });
+        if (!checkInTime) {
+          setCheckInTime(timeNow);
+          await axiosInstance.post(`/users/${user_id}/attendances/create_to_recognize`, {
+            date: dayjs().format('YYYY-MM-DD'),
+            time_check: timeNow,
+            attendance_type_id: 1,
+          });
+          setMessage('Check-in successfully!');
+        } else {
+          setCheckOutTime(timeNow);
+          await axiosInstance.post(`/users/${user_id}/attendances/create_to_recognize`, {
+            date: dayjs().format('YYYY-MM-DD'),
+            time_check: timeNow,
+            attendance_type_id: 2,
+          });
+          setMessage('Check-out successfully!');
+        }
       } else {
         setMessage('No face detected');
       }
+
+      setShowSuccess(true);
+
+      setTimeout(() => setShowSuccess(false), 3000);
+
+      closeModal();
     } catch (error) {
       console.error('Face recognition error:', error);
     }
