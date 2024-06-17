@@ -11,12 +11,14 @@ import AdminProfile from '~/pages/AdminProfile';
 import AccountManagement from '~/pages/AccountManagement';
 import CapturePage from '~/pages/CapturePage';
 import AdminSetting from '~/pages/AdminSetting';
+import History from '~/pages/History';
 
 // Public routes
 const publicRoutes = [
   { path: config.routes.home, component: Home },
   { path: config.routes.login, component: Login, layout: null },
   { path: config.routes.profile, component: Profile },
+  { path: config.routes.history, component: History },
 ];
 
 const adminRoutes = [

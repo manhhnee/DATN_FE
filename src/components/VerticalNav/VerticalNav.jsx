@@ -54,6 +54,17 @@ const VerticalNav = () => {
               <span className={`${!open && 'hidden'} origin-left duration-200 text-white`}>Profile</span>
             </li>
           </NavLink>
+          <NavLink to={config.routes.history}>
+            <li
+              className={`flex rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300 text-sm items-center gap-x-4 mt-2  ${pathname.includes('/history') && 'bg-light-white'}  ${!open && 'justify-center'}`}
+            >
+              <FontAwesomeIcon
+                icon={faClockRotateLeft}
+                className={`cursor-pointer duration-500 ${open && 'rotate-[360deg] text-blue-300'} text-white`}
+              />
+              <span className={`${!open && 'hidden'} origin-left duration-200 text-white`}>History</span>
+            </li>
+          </NavLink>
         </ul>
         <Labels />
       </div>
