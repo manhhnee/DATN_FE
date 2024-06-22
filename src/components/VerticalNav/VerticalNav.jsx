@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleChevronLeft, faClock, faClockRotateLeft, faHouse } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCircleChevronLeft,
+  faClock,
+  faClockRotateLeft,
+  faComment,
+  faHouse,
+  faIdCard,
+} from '@fortawesome/free-solid-svg-icons';
 
 import Labels from '~/components/Labels';
 import { NavLink, useLocation } from 'react-router-dom';
@@ -48,7 +55,7 @@ const VerticalNav = () => {
               className={`flex rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300 text-sm items-center gap-x-4 mt-2  ${pathname.includes('/profile') && 'bg-light-white'}  ${!open && 'justify-center'}`}
             >
               <FontAwesomeIcon
-                icon={faClockRotateLeft}
+                icon={faIdCard}
                 className={`cursor-pointer duration-500 ${open && 'rotate-[360deg] text-blue-300'} text-white`}
               />
               <span className={`${!open && 'hidden'} origin-left duration-200 text-white`}>Profile</span>
@@ -63,6 +70,17 @@ const VerticalNav = () => {
                 className={`cursor-pointer duration-500 ${open && 'rotate-[360deg] text-blue-300'} text-white`}
               />
               <span className={`${!open && 'hidden'} origin-left duration-200 text-white`}>History</span>
+            </li>
+          </NavLink>
+          <NavLink to={config.routes.report}>
+            <li
+              className={`flex rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300 text-sm items-center gap-x-4 mt-2  ${pathname.includes('/report') && 'bg-light-white'}  ${!open && 'justify-center'}`}
+            >
+              <FontAwesomeIcon
+                icon={faComment}
+                className={`cursor-pointer duration-500 ${open && 'rotate-[360deg] text-blue-300'} text-white`}
+              />
+              <span className={`${!open && 'hidden'} origin-left duration-200 text-white`}>Report</span>
             </li>
           </NavLink>
         </ul>

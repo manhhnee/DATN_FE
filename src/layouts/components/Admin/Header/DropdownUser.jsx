@@ -73,7 +73,6 @@ const DropdownUser = () => {
           <span className="block text-sm font-medium text-black dark:text-white">
             {getFullName(user.first_name, user.last_name)}
           </span>
-          <span className="block text-xs">UX Designer</span>
         </span>
 
         <span className="h-12 w-12 rounded-full content-center">

@@ -1,3 +1,5 @@
+import { faGifts } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import config from '~/config';
@@ -212,6 +214,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                     </defs>
                   </svg>
                   Account management
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to={config.routes.holidayManagement}
+                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                    pathname.includes('admin/holiday/management') && 'bg-graydark dark:bg-meta-4'
+                  }`}
+                >
+                  <FontAwesomeIcon icon={faGifts} />
+                  Holiday management
                 </NavLink>
               </li>
             </ul>

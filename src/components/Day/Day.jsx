@@ -16,7 +16,7 @@ function Day({ day, rowIdx }) {
 
   useEffect(() => {
     const fetchDate = async () => {
-      if (isLoggedIn) {
+      if (isLoggedIn && userId) {
         const response = await axiosInstance.get(`/users/${userId}/attendances/user_attendances`);
         setAttendanceData(response.data);
       }

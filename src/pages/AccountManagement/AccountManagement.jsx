@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCalculator, faMoneyBill, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -16,14 +16,15 @@ const AccountManagement = () => {
   const [departments, setDepartments] = useState([]);
   const [userData, setUserData] = useState([]);
   const [attendances, setAttendances] = useState({});
+  const [salaries, setSalaries] = useState([]);
   const [isModalOpen1, setIsModalOpen1] = useState(false);
-  const [isModalOpen3, setIsModalOpen3] = useState(false);
   const [isModalOpen2, setIsModalOpen2] = useState(false);
+  const [isModalOpen3, setIsModalOpen3] = useState(false);
+  const [isModalOpen4, setIsModalOpen4] = useState(false);
+  const [message, setMessage] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
-  const [showSuccess2, setShowSuccess2] = useState(false);
-  const [showSuccess3, setShowSuccess3] = useState(false);
 
-  const [formData2, setFormData2] = useState({
+  const [formData, setFormData] = useState({
     email: '',
     password: '',
     department_id: '1',
@@ -50,7 +51,6 @@ const AccountManagement = () => {
       try {
         if (userId) {
           const response = await axiosInstance.get(`/users/${userId}/attendances`);
-          console.log(response.data);
           setAttendances(response.data);
         }
       } catch (error) {
@@ -59,6 +59,21 @@ const AccountManagement = () => {
     };
 
     fetchAttendanceByID();
+  }, [userId]);
+
+  useEffect(() => {
+    const fetchSalaryByID = async () => {
+      try {
+        if (userId) {
+          const response = await axiosInstance.get(`/salaries?user_id=${userId}`);
+          setSalaries(response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching salaries:', error);
+      }
+    };
+
+    fetchSalaryByID();
   }, [userId]);
 
   useEffect(() => {
@@ -76,9 +91,9 @@ const AccountManagement = () => {
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     const updateData = new FormData();
-    for (const key in formData2) {
-      if (formData2[key]) {
-        updateData.append(key, formData2[key]);
+    for (const key in formData) {
+      if (formData[key]) {
+        updateData.append(key, formData[key]);
       }
     }
     try {
@@ -92,6 +107,7 @@ const AccountManagement = () => {
         navigate(`${config.routes.capture.replace(':user_id', userId)}`);
       }
       setIsModalOpen1(false);
+      setMessage('Create user successfully !');
       setShowSuccess(true);
 
       setTimeout(() => setShowSuccess(false), 3000);
@@ -106,9 +122,10 @@ const AccountManagement = () => {
       const response = await axiosInstance.get('/users');
       setUserData(response.data.data);
       setIsModalOpen3(false);
-      setShowSuccess3(true);
+      setMessage('Delete user successfully !');
+      setShowSuccess(true);
 
-      setTimeout(() => setShowSuccess3(false), 3000);
+      setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
       if (error.response && error.response.status === 422) {
         console.log(error.response.data);
@@ -118,31 +135,41 @@ const AccountManagement = () => {
     }
   };
 
-  const handleTrainData = async () => {
+  const calculateSalary = async () => {
     try {
-      const reponse = await axiosInstance.post('/train_classifier');
-      console.log(reponse.data);
-    } catch (error) {
-      if (error.response && error.response.status === 422) {
-        console.log(error.response.data);
-      } else {
-        console.error('Train data user error:', error);
-      }
-    }
-  };
-
-  const calculateSalary = async (userId) => {
-    try {
+      console.log(userId);
       const response = await axiosInstance.post('/salaries', {
         salary: {
           user_id: userId,
         },
       });
+      const salaries = await axiosInstance.get(`/salaries?user_id=${userId}`);
+      setSalaries(salaries.data);
       setIsModalOpen2(false);
-      setShowSuccess2(true);
+      setMessage('Calculate salary successfully!');
+      setShowSuccess(true);
 
-      setTimeout(() => setShowSuccess2(false), 3000);
+      setTimeout(() => setShowSuccess(false), 3000);
       console.log('Salary calculation response:', response.data);
+    } catch (error) {
+      if (error.response) {
+        console.log('Error response:', error.response.data);
+      } else {
+        console.error('Calculate salary error:', error);
+      }
+    }
+  };
+
+  const handleRemoveAttendance = async (attendanceId) => {
+    try {
+      const response = await axiosInstance.delete(`/attendances/${attendanceId}`);
+      const attendances = await axiosInstance.get(`/users/${userId}/attendances`);
+      setAttendances(attendances.data);
+      setMessage('Remove attendance successfully!');
+      setShowSuccess(true);
+
+      setTimeout(() => setShowSuccess(false), 3000);
+      console.log('Remove attendances response:', response.data);
     } catch (error) {
       if (error.response) {
         console.log('Error response:', error.response.data);
@@ -154,16 +181,16 @@ const AccountManagement = () => {
 
   const handleInputChange2 = (e) => {
     const { name, value } = e.target;
-    setFormData2({
-      ...formData2,
+    setFormData({
+      ...formData,
       [name]: value,
     });
   };
 
   const handleSelectChange = (e) => {
     const selectedDepartmentId = e.target.value;
-    setFormData2({
-      ...formData2,
+    setFormData({
+      ...formData,
       department_id: selectedDepartmentId,
     });
   };
@@ -185,6 +212,11 @@ const AccountManagement = () => {
     setIsModalOpen3(true);
   };
 
+  const openModal4 = (user_id) => {
+    setUserId(user_id);
+    setIsModalOpen4(true);
+  };
+
   const handleViewAttendance = (user_id) => {
     setUserId(user_id);
     setIsModalOpen2(true);
@@ -192,6 +224,10 @@ const AccountManagement = () => {
 
   const closeModal3 = () => {
     setIsModalOpen3(false);
+  };
+
+  const closeModal4 = () => {
+    setIsModalOpen4(false);
   };
 
   const formatTime = (isoString) => {
@@ -203,39 +239,20 @@ const AccountManagement = () => {
     return `${hours}:${minutes}:${seconds}`;
   };
 
+  const formatCurrency = (amount) => {
+    return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+  };
+
   return (
     <AdminLayouts>
       <Breadcrumb pageName={'Account-Management'} />
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex items-center py-6 px-4 md:px-6 xl:px-7.5">
-          <h4 className="text-xl font-semibold text-black dark:text-white">List Account</h4>
-          {/* <button
-            type="button"
-            onClick={handleTrainData}
-            className="ml-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            <svg
-              className="fill-current mr-2"
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#000000"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="16"></line>
-              <line x1="8" y1="12" x2="16" y2="12"></line>
-            </svg>
-            Train data
-          </button> */}
+          <h4 className="text-xl font-semibold text-black dark:text-white ">List Account</h4>
           <button
             type="button"
             onClick={openModal1}
-            className="ml-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            className="ml-auto text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
             <svg
               className="fill-current mr-2"
@@ -341,12 +358,17 @@ const AccountManagement = () => {
                           </p>
                           <div className="flex justify-end space-x-2 mt-4">
                             <button
-                              className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded px-4 py-2"
+                              className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded px-4 py-2 text-center"
                               onClick={closeModal3}
                             >
+                              <FontAwesomeIcon icon={faXmark} className="pr-3" />
                               Cancel
                             </button>
-                            <button className="bg-red-600 text-white rounded px-4 py-2" onClick={handleConfirmDelete}>
+                            <button
+                              className="bg-red-600 text-white rounded px-4 py-2 text-center"
+                              onClick={handleConfirmDelete}
+                            >
+                              <FontAwesomeIcon icon={faTrash} className="pr-4" />
                               Delete
                             </button>
                           </div>
@@ -357,22 +379,7 @@ const AccountManagement = () => {
                 )}
                 {/*Handle view Attendance by UserID */}
                 <button onClick={() => handleViewAttendance(user.id)} className="hover:text-primary-600">
-                  <svg
-                    className="fill-current"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#000000"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                    <line x1="8" y1="21" x2="16" y2="21"></line>
-                    <line x1="12" y1="17" x2="12" y2="21"></line>
-                  </svg>
+                  <FontAwesomeIcon icon={faCalculator} />
                 </button>
                 {/* Open modal view Attendance by UserID */}
                 {isModalOpen2 && (
@@ -382,40 +389,96 @@ const AccountManagement = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -50 }}
                       transition={{ duration: 0.3 }}
-                      className="fixed top-1/3 left-1/3  z-50 bg-white shadow-1 w-180 rounded-lg overflow-auto"
+                      className="fixed top-1/3 left-1/3 transform -translate-x-1/3 -translate-y-1/3 h-125 z-50 bg-white shadow-1 w-180 rounded-lg overflow-auto"
                     >
                       <div className="p-4">
-                        <table className="w-full text-sm text-left text-gray-500">
-                          <thead className="text-xs bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
-                            <tr>
-                              <th className="px-6 py-3">Date</th>
-                              <th className="px-6 py-3">Time check in</th>
-                              <th className="px-6 py-3">Time check out</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {Object.entries(attendances).map(([date, { check_in, check_out }]) => (
-                              <tr key={date} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                <td className="px-6 py-4 font-medium whitespace-nowrap">{date}</td>
-                                <td className="px-6 py-4">{formatTime(check_in)}</td>
-                                <td className="px-6 py-4">{formatTime(check_out)}</td>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm text-left text-gray-500">
+                            <thead className="text-xs bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                              <tr>
+                                <th className="px-6 py-3">Date</th>
+                                <th className="px-6 py-3">Time check</th>
+                                <th className="px-6 py-3">Action</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {attendances.length > 0 &&
+                                attendances.map((attendance) => (
+                                  <tr key={attendance.id} className="bg-white border-b ">
+                                    <td className="px-6 py-4 font-medium whitespace-nowrap">{attendance.date}</td>
+                                    <td className="px-6 py-4">{formatTime(attendance.time_check)}</td>
+                                    <td className="px-6 py-4">
+                                      <button
+                                        onClick={() => handleRemoveAttendance(attendance.id)}
+                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                      >
+                                        Remove
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
+
                       <div className="pb-4 pr-4 border-gray-200 dark:border-gray-700 flex justify-end space-x-2">
                         <button
-                          className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded px-4 py-2"
+                          className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded px-4 py-2 text-center"
                           onClick={closeModal2}
                         >
-                          Cancel
+                          <FontAwesomeIcon icon={faXmark} className="pr-3" />
+                          Close
                         </button>
-                        <button
-                          className="bg-blue-500 text-white rounded px-4 py-2"
-                          onClick={() => calculateSalary(user.id)}
-                        >
+                        <button className="bg-blue-500 text-white rounded px-4 py-2" onClick={() => calculateSalary()}>
                           Calculator Salary
+                        </button>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                )}
+                <button onClick={() => openModal4(user.id)} className="hover:text-primary-600">
+                  <FontAwesomeIcon icon={faMoneyBill} />
+                </button>
+                {/* Open modal view Salary by UserID */}
+                {isModalOpen4 && (
+                  <AnimatePresence>
+                    <motion.div
+                      initial={{ opacity: 0, y: -50 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -50 }}
+                      transition={{ duration: 0.3 }}
+                      className="fixed top-1/3 left-1/3 transform -translate-x-1/3 -translate-y-1/3 h-125 z-50 bg-white shadow-1 w-180 rounded-lg overflow-auto"
+                    >
+                      <div className="p-4">
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm text-left text-gray-500">
+                            <thead className="text-xs bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+                              <tr>
+                                <th className="px-6 py-3">Month</th>
+                                <th className="px-6 py-3">Total Salary</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {salaries.length > 0 &&
+                                salaries.map((salary) => (
+                                  <tr key={salary.month} className="bg-white border-b">
+                                    <td className="px-6 py-4 font-medium whitespace-nowrap">{salary.month}</td>
+                                    <td className="px-6 py-4">{formatCurrency(parseFloat(salary.total_salary))}</td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+
+                      <div className="pb-4 pr-4 border-gray-200 dark:border-gray-700 flex justify-end space-x-2">
+                        <button
+                          className="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded px-4 py-2 m-2 text-center"
+                          onClick={closeModal4}
+                        >
+                          <FontAwesomeIcon icon={faXmark} className="pr-3" />
+                          Close
                         </button>
                       </div>
                     </motion.div>
@@ -482,7 +545,7 @@ const AccountManagement = () => {
                             name="email"
                             id="email"
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            value={formData2.email}
+                            value={formData.email}
                             onChange={handleInputChange2}
                             required
                           />
@@ -499,7 +562,7 @@ const AccountManagement = () => {
                             name="password"
                             id="password"
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            value={formData2.password}
+                            value={formData.password}
                             onChange={handleInputChange2}
                             required
                           />
@@ -516,7 +579,7 @@ const AccountManagement = () => {
                             name="first_name"
                             id="first_name"
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            value={formData2.first_name}
+                            value={formData.first_name}
                             onChange={handleInputChange2}
                             required
                           />
@@ -533,7 +596,7 @@ const AccountManagement = () => {
                             name="last_name"
                             id="last_name"
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            value={formData2.last_name}
+                            value={formData.last_name}
                             onChange={handleInputChange2}
                             required
                           />
@@ -551,7 +614,7 @@ const AccountManagement = () => {
                             name="phone_number"
                             id="phone_number"
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            value={formData2.phone_number}
+                            value={formData.phone_number}
                             onChange={handleInputChange2}
                             required
                           />
@@ -568,7 +631,7 @@ const AccountManagement = () => {
                             name="date_of_birth"
                             id="date_of_birth"
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            value={formData2.date_of_birth}
+                            value={formData.date_of_birth}
                             onChange={handleInputChange2}
                             required
                           />
@@ -585,7 +648,7 @@ const AccountManagement = () => {
                             name="basic_salary"
                             id="basic_salary"
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            value={formData2.basic_salary}
+                            value={formData.basic_salary}
                             onChange={handleInputChange2}
                             required
                           />
@@ -601,7 +664,7 @@ const AccountManagement = () => {
                             name="department"
                             id="department"
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            value={formData2.department_id}
+                            value={formData.department_id}
                             onChange={handleSelectChange}
                             required
                           >
@@ -635,33 +698,7 @@ const AccountManagement = () => {
               transition={{ duration: 0.3 }}
               className="fixed top-20 right-0 left-0 z-50 flex justify-center items-center p-4"
             >
-              <Popup icon={<FontAwesomeIcon icon={faCheckCircle} />} children={'Create user succesfully !'} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <AnimatePresence>
-          {showSuccess2 && (
-            <motion.div
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              transition={{ duration: 0.3 }}
-              className="fixed top-20 right-0 left-0 z-50 flex justify-center items-center p-4"
-            >
-              <Popup icon={<FontAwesomeIcon icon={faCheckCircle} />} children={'Caculator salary successfully !'} />
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <AnimatePresence>
-          {showSuccess3 && (
-            <motion.div
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              transition={{ duration: 0.3 }}
-              className="fixed top-20 right-0 left-0 z-50 flex justify-center items-center p-4"
-            >
-              <Popup icon={<FontAwesomeIcon icon={faCheckCircle} />} children={'Delete user successfully !'} />
+              <Popup children={message} />
             </motion.div>
           )}
         </AnimatePresence>

@@ -12,6 +12,8 @@ import AccountManagement from '~/pages/AccountManagement';
 import CapturePage from '~/pages/CapturePage';
 import AdminSetting from '~/pages/AdminSetting';
 import History from '~/pages/History';
+import Holiday from '~/pages/Holiday';
+import Report from '~/pages/Report';
 
 // Public routes
 const publicRoutes = [
@@ -19,6 +21,7 @@ const publicRoutes = [
   { path: config.routes.login, component: Login, layout: null },
   { path: config.routes.profile, component: Profile },
   { path: config.routes.history, component: History },
+  { path: config.routes.report, component: Report },
 ];
 
 const adminRoutes = [
@@ -26,6 +29,7 @@ const adminRoutes = [
   { path: config.routes.calendar, component: Calendar, layout: null },
   { path: config.routes.adminProfile, component: AdminProfile, layout: null },
   { path: config.routes.accountManagement, component: AccountManagement, layout: null },
+  { path: config.routes.holidayManagement, component: Holiday, layout: null },
   { path: config.routes.capture, component: CapturePage, layout: null },
   { path: config.routes.adminSetting, component: AdminSetting, layout: null },
 ];

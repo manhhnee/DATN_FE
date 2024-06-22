@@ -24,8 +24,7 @@ function Header() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [checkInTime, setCheckInTime] = useState(null);
-  const [checkOutTime, setCheckOutTime] = useState(null);
+  const [isCheckIn, setIsCheckIn] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [message, setMessage] = useState('');
   const webcamRef = useRef(null);
@@ -34,8 +33,16 @@ function Header() {
     const fetchUserInfo = async () => {
       try {
         if (isLoggedIn) {
-          const response = await axiosInstance.get(`/users/${userId}`);
-          setUserInfo(response.data.data);
+          const userData = await axiosInstance.get(`/users/${userId}`);
+          setUserInfo(userData.data.data);
+
+          const attendancesData = await axiosInstance.get(`/users/${userId}/attendances/user_attendances`);
+          const today = dayjs().format('YYYY-MM-DD');
+          if (attendancesData.data[today]) {
+            setIsCheckIn(true);
+          } else {
+            setIsCheckIn(false);
+          }
         }
       } catch (error) {
         console.error('Fetch user info error:', error);
@@ -89,9 +96,7 @@ function Header() {
       const timeNow = dayjs().format('YYYY-MM-DDTHH:mm:ssZ');
       console.log(timeNow);
 
-      if (!checkInTime) {
-        // Check-in
-        setCheckInTime(timeNow);
+      if (!isCheckIn) {
         await axiosInstance.post(`/users/${userId}/attendances`, {
           date: dayjs().format('YYYY-MM-DD'),
           time_check: timeNow,
@@ -99,8 +104,6 @@ function Header() {
         });
         setMessage('Check-in successfully!');
       } else {
-        // Check-out
-        setCheckOutTime(timeNow);
         await axiosInstance.post(`/users/${userId}/attendances`, {
           date: dayjs().format('YYYY-MM-DD'),
           time_check: timeNow,
@@ -110,28 +113,31 @@ function Header() {
       }
 
       closeModal();
+      setShowSuccess(true);
+
+      setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
+      setMessage(error.response.data.error);
+      setShowSuccess(true);
+
+      setTimeout(() => setShowSuccess(false), 3000);
       console.error('Check-in/out error:', error);
     }
   };
 
   const handleCheckInOutToRecognize = async () => {
     const imageSrc = webcamRef.current.getScreenshot();
-    console.log(imageSrc);
     try {
-      const response = await axiosInstance.post('/recognize', {
+      const response = await axios.post('https://dabf-2001-ee0-4b6f-3de0-d272-ac52-e04-2e1.ngrok-free.app/recognize', {
         image: imageSrc,
       });
-      const { message, output } = response.data;
-      console.log(message);
-      console.log(output);
-
-      if (output) {
-        const user_id = output.toString().trim();
+      const { message, results } = response.data;
+      console.log(results);
+      console.log(results[0]);
+      if (results[0]) {
+        const user_id = results[0].class;
         const timeNow = dayjs().format('YYYY-MM-DDTHH:mm:ssZ');
-
-        if (!checkInTime) {
-          setCheckInTime(timeNow);
+        if (!isCheckIn) {
           await axiosInstance.post(`/users/${user_id}/attendances/create_to_recognize`, {
             date: dayjs().format('YYYY-MM-DD'),
             time_check: timeNow,
@@ -139,7 +145,6 @@ function Header() {
           });
           setMessage('Check-in successfully!');
         } else {
-          setCheckOutTime(timeNow);
           await axiosInstance.post(`/users/${user_id}/attendances/create_to_recognize`, {
             date: dayjs().format('YYYY-MM-DD'),
             time_check: timeNow,
@@ -181,9 +186,11 @@ function Header() {
 
       {isLoggedIn ? (
         <div className="ml-auto relative flex">
-          <button className={cx('btn-check')} onClick={handleCheckInOut}>
-            {checkInTime ? 'Check Out' : 'Check In'}
-          </button>
+          {isCheckIn !== null && (
+            <button className={cx('btn-check')} onClick={handleCheckInOut}>
+              {isCheckIn ? 'Check Out' : 'Check In'}
+            </button>
+          )}
           <button
             id="dropdownInformationButton"
             onClick={toggleDropdown}
@@ -294,9 +301,11 @@ function Header() {
                     </div>
                     <div className="p-4 md:p-5 space-y-4">
                       <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" width={640} height={480} />
-                      <button className={cx('btn-check', 'ml-auto', 'mr-auto')} onClick={handleCheckInOutToRecognize}>
-                        {checkInTime ? 'Check Out' : 'Check In'}
-                      </button>
+                      {isCheckIn !== null && (
+                        <button className={cx('btn-check', 'ml-auto', 'mr-auto')} onClick={handleCheckInOutToRecognize}>
+                          {isCheckIn ? 'Check Out' : 'Check In'}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

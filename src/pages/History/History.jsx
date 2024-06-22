@@ -32,8 +32,8 @@ const History = () => {
 
   return (
     <div className="w-full p-3 dark:bg-slate-600">
-      <table className="w-full text-sm text-left text-gray-500 shadow-4">
-        <thead className="text-xs bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+      <table className="w-full text-sm text-left text-gray-500 shadow-6">
+        <thead className="text-xs bg-gray-100 dark:bg-gray-700 dark:text-gray-200">
           <tr>
             <th className="px-6 py-3">Date</th>
             <th className="px-6 py-3">Time check in</th>
@@ -42,7 +42,7 @@ const History = () => {
         </thead>
         <tbody>
           {Object.entries(attendances).map(([date, { check_in, check_out }]) => (
-            <tr key={date} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+            <tr key={date} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
               <td className="px-6 py-4 font-medium whitespace-nowrap">{date}</td>
               <td className="px-6 py-4">{formatTime(check_in)}</td>
               <td className="px-6 py-4">{formatTime(check_out)}</td>
