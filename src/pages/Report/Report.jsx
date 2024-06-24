@@ -38,14 +38,15 @@ const Report = () => {
 
   const fetchAttendanceTypes = async () => {
     try {
-      const reponse = await axiosInstance.get(`attendance_types`);
+      const reponse = await axiosInstance.get(`/attendance_types`);
       setAttendanceTypes(reponse.data);
     } catch (error) {
       console.error('Fetch attendance types error:', error);
     }
   };
 
-  const handleCreateReport = async () => {
+  const handleCreateReport = async (e) => {
+    e.preventDefault();
     try {
       const localDateTimeString = `${formData.date}T${formData.time_check}:00`;
       const localDateTime = new Date(localDateTimeString);
@@ -57,6 +58,7 @@ const Report = () => {
       }
 
       const utcDateTimeString = localDateTime.toISOString();
+      console.log(formData, userId, utcDateTimeString);
 
       await axiosInstance.post(
         `/users/${userId}/reports`,
@@ -76,10 +78,19 @@ const Report = () => {
       );
       setMessage('Create report successfully');
       setShowSuccess(true);
+      setFormData({
+        date: '',
+        attendance_type_id: '',
+        time_check: '',
+        reason: '',
+      });
+      fetchReport();
 
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
       console.error('Create report error:', error);
+      setMessage('Failed to create report');
+      setShowSuccess(true);
     }
   };
 

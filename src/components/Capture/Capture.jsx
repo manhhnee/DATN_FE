@@ -18,7 +18,7 @@ const Capture = () => {
   const [capturing, setCapturing] = useState(false);
   const [captureCount, setCaptureCount] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
-  const maxCaptures = 50;
+  const maxCaptures = 200;
 
   const capture = useCallback(async () => {
     setCapturing(true);
@@ -40,7 +40,7 @@ const Capture = () => {
         return;
       }
       count++;
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 1));
     }
     setMessage('Dataset generated successfully.');
     setCapturing(false);

@@ -26,6 +26,7 @@ function Header() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCheckIn, setIsCheckIn] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const webcamRef = useRef(null);
 
@@ -127,13 +128,14 @@ function Header() {
 
   const handleCheckInOutToRecognize = async () => {
     const imageSrc = webcamRef.current.getScreenshot();
+    setIsLoading(true);
     try {
-      const response = await axios.post('https://dabf-2001-ee0-4b6f-3de0-d272-ac52-e04-2e1.ngrok-free.app/recognize', {
+      const response = await axios.post('http://127.0.0.1:5000/recognize', {
         image: imageSrc,
       });
       const { message, results } = response.data;
+      console.log(message);
       console.log(results);
-      console.log(results[0]);
       if (results[0]) {
         const user_id = results[0].class;
         const timeNow = dayjs().format('YYYY-MM-DDTHH:mm:ssZ');
@@ -157,6 +159,7 @@ function Header() {
       }
 
       setShowSuccess(true);
+      setIsLoading(false);
 
       setTimeout(() => setShowSuccess(false), 3000);
 
@@ -299,13 +302,21 @@ function Header() {
                         <span className="sr-only">Close modal</span>
                       </button>
                     </div>
+                    {isLoading && (
+                      <div role="status" class="absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2">
+                        <div class="h-24 w-24 rounded-full border-t-8 border-b-8 border-gray-200"></div>
+                        <div class="absolute top-0 left-0 h-24 w-24 rounded-full border-t-8 border-b-8 border-blue-500 animate-spin"></div>
+                      </div>
+                    )}
                     <div className="p-4 md:p-5 space-y-4">
                       <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg" width={640} height={480} />
-                      {isCheckIn !== null && (
-                        <button className={cx('btn-check', 'ml-auto', 'mr-auto')} onClick={handleCheckInOutToRecognize}>
-                          {isCheckIn ? 'Check Out' : 'Check In'}
-                        </button>
-                      )}
+                      <button
+                        className={cx('btn-check', 'ml-auto', 'mr-auto')}
+                        onClick={handleCheckInOutToRecognize}
+                        disabled={isLoading}
+                      >
+                        Check
+                      </button>
                     </div>
                   </div>
                 </div>

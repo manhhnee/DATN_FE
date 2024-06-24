@@ -308,7 +308,7 @@ const Profile = () => {
           <img
             src={
               userInfo && userInfo.avatar_url
-                ? `http://localhost:3000/${userInfo.avatar_url}`
+                ? `https://2hm-ai-store.click/${userInfo.avatar_url}`
                 : 'https://www.shutterstock.com/image-vector/blank-avatar-photo-place-holder-600nw-1114445501.jpg'
             }
             className="rounded-none lg:rounded-lg shadow-2xl hidden lg:block"
