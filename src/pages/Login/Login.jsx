@@ -17,8 +17,8 @@ function Login() {
     e.preventDefault();
     try {
       const response = await axiosInstance.post('/login', {
-        email: email,
-        password: password,
+        email,
+        password,
         remember: rememberMe,
       });
       Cookies.set('jwt', response.data.token, { expires: rememberMe ? 7 : null });
@@ -26,7 +26,12 @@ function Login() {
       setIsLoggedIn(true);
       setUserId(response.data.user_id);
       setRole(response.data.role);
-      navigate('/home');
+
+      if (response.data.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/home');
+      }
     } catch (error) {
       console.error('Login error:', error);
       setErrorMessage(error.response?.data?.error || 'An unexpected error occurred. Please try again later.');

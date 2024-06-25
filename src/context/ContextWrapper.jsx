@@ -97,9 +97,11 @@ export default function ContextWrapper(props) {
   useEffect(() => {
     async function fetchNotes() {
       try {
-        const response = await axiosInstance.get(`/users/${userId}/notes`);
-        const fetchedNotes = response.data.data;
-        dispatchCalEvent({ type: 'set', payload: fetchedNotes });
+        if (userId) {
+          const response = await axiosInstance.get(`/users/${userId}/notes`);
+          const fetchedNotes = response.data.data;
+          dispatchCalEvent({ type: 'set', payload: fetchedNotes });
+        }
       } catch (error) {
         console.error('Error fetching notes:', error);
       }
