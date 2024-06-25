@@ -97,7 +97,7 @@ const Dashboard = () => {
                   <img
                     src={
                       report.user.avatar_url
-                        ? `http://127.0.0.1/${report.user.avatar_url}`
+                        ? `https://2hm-ai-store.click/${report.user.avatar_url}`
                         : 'https://www.shutterstock.com/image-vector/blank-avatar-photo-place-holder-600nw-1114445501.jpg'
                     }
                     className="w-10 h-10 rounded-full"
