@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalculator, faMoneyBill, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +11,7 @@ import Popup from '~/components/Popup';
 import config from '~/config';
 
 const AccountManagement = () => {
+  const modalRef = useRef(null);
   const navigate = useNavigate();
   const [userId, setUserId] = useState();
   const [departments, setDepartments] = useState([]);
@@ -243,6 +244,24 @@ const AccountManagement = () => {
     return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
   };
 
+  const handleClickOutside = (event) => {
+    // Assuming your modal div has a ref assigned to it called modalRef
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      closeModal2();
+    }
+  };
+
+  useEffect(() => {
+    // Add when the modal is open and clean up on close or component unmount
+    if (isModalOpen2) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isModalOpen2]);
+
   return (
     <AdminLayouts>
       <Breadcrumb pageName={'Account-Management'} />
@@ -390,6 +409,7 @@ const AccountManagement = () => {
                       exit={{ opacity: 0, y: -50 }}
                       transition={{ duration: 0.3 }}
                       className="fixed top-1/3 left-1/3 transform -translate-x-1/3 -translate-y-1/3 h-125 z-50 bg-white shadow-1 w-180 rounded-lg overflow-auto"
+                      ref={modalRef}
                     >
                       <div className="p-4">
                         <div className="overflow-x-auto">
