@@ -101,14 +101,14 @@ function Header() {
         await axiosInstance.post(`/users/${userId}/attendances`, {
           date: dayjs().format('YYYY-MM-DD'),
           time_check: timeNow,
-          attendance_type_id: 1, // Assuming 1 is the ID for check-in
+          attendance_type_id: 1,
         });
         setMessage('Check-in successfully!');
       } else {
         await axiosInstance.post(`/users/${userId}/attendances`, {
           date: dayjs().format('YYYY-MM-DD'),
           time_check: timeNow,
-          attendance_type_id: 2, // Assuming 2 is the ID for check-out
+          attendance_type_id: 2,
         });
         setMessage('Check-out successfully!');
       }
@@ -133,11 +133,12 @@ function Header() {
       const response = await axios.post('http://127.0.0.1:5000/recognize', {
         image: imageSrc,
       });
-      const { message, results } = response.data;
-      console.log(message);
-      console.log(results);
+      const { results } = response.data;
       if (results[0]) {
         const user_id = results[0].class;
+        const userData = await axiosInstance.get(`/users/${user_id}`);
+        console.log(userData.data);
+        const fullName = getAllName(userData.data.data.first_name, userData.data.data.last_name);
         const timeNow = dayjs().format('YYYY-MM-DDTHH:mm:ssZ');
         if (!isCheckIn) {
           await axiosInstance.post(`/users/${user_id}/attendances/create_to_recognize`, {
@@ -145,14 +146,14 @@ function Header() {
             time_check: timeNow,
             attendance_type_id: 1,
           });
-          setMessage('Check-in successfully!');
+          setMessage(`Check for ${fullName} successfully!`);
         } else {
           await axiosInstance.post(`/users/${user_id}/attendances/create_to_recognize`, {
             date: dayjs().format('YYYY-MM-DD'),
             time_check: timeNow,
             attendance_type_id: 2,
           });
-          setMessage('Check-out successfully!');
+          setMessage(`Check for ${fullName} successfully!`);
         }
       } else {
         setMessage('No face detected');

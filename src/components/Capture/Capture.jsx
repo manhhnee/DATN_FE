@@ -40,7 +40,7 @@ const Capture = () => {
         return;
       }
       count++;
-      await new Promise((resolve) => setTimeout(resolve, 1));
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
     setMessage('Dataset generated successfully.');
     setCapturing(false);
